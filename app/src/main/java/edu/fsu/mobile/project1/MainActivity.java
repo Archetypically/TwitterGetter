@@ -30,7 +30,7 @@ public class MainActivity
         GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
-    private final LatLng defLoc = new LatLng(30, -84);
+    private final LatLng defLoc = new LatLng(30.26, -84.18);
     private LatLng currLoc;
     private GoogleApiClient mGoogleApiClient;
 
@@ -81,7 +81,6 @@ public class MainActivity
         mMap = googleMap;
 
         mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(defLoc));
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
