@@ -30,7 +30,7 @@ public class MainActivity
         GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
-    private final LatLng defLoc = new LatLng(30, 84);
+    private final LatLng defLoc = new LatLng(30, -84);
     private LatLng currLoc;
     private GoogleApiClient mGoogleApiClient;
 
@@ -39,19 +39,15 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-
-            // Create an instance of GoogleAPIClient.
-            if (mGoogleApiClient == null) {
-                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
-            }
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
         }
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -87,6 +83,11 @@ public class MainActivity
         mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(defLoc));
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        }
+
     }
 
     /*
@@ -112,7 +113,7 @@ public class MainActivity
     @Override
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "You do not have the permissions set to display current location.", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "You do not have the permissions set to display current location.", Toast.LENGTH_SHORT).show();
             return;
         }
         Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
