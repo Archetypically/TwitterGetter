@@ -37,11 +37,22 @@ public class TwitterGetter extends Thread {
         this.mainActivity = mainActivity;
         res = mainActivity.getResources();
 
-        geoCode = "geocode=" +
-                mainActivity.defLoc.latitude +
-                "%2C" +
-                mainActivity.defLoc.longitude +
-                "%2C30mi";
+        if(mainActivity.currLoc == null){
+            geoCode = "geocode=" +
+                    mainActivity.defLoc.latitude +
+                    "%2C" +
+                    mainActivity.defLoc.longitude +
+                    "%2C30mi";
+        }
+        else {
+            geoCode = "geocode=" +
+                    mainActivity.currLoc.latitude +
+                    "%2C" +
+                    mainActivity.currLoc.longitude +
+                    "%2C30mi";
+        }
+
+
     }
 
     public void run() {

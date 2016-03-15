@@ -35,7 +35,7 @@ public class MainActivity
 
     protected GoogleMap mMap;
     protected final LatLng defLoc = new LatLng(30.2618, -84.1814);
-    private LatLng currLoc;
+    protected LatLng currLoc;
     private GoogleApiClient mGoogleApiClient;
     private TwitterGetter tg;
 

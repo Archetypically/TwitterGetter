@@ -7,4 +7,5 @@
     <string name="api_secret">jKhDc4IpqhKCbDdmXIpnb20YnZN0gy5n2oj7tPafP0jW0V7iTp</string>
     <string name="token">3283700119-9Y8zzYK7wCr6dXWLyHNKvRSLISsbJCs058gJwgB</string>
     <string name="token_secret">V41JnB6a6tbQBCGFI9DMjK9aVfqNXMeYIPhCdwEslXKEC</string>
+    <string name="title_activity_splash">SplashActivity</string>
 </resources>
