@@ -1,12 +1,14 @@
 package edu.fsu.mobile.project1;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +22,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity
@@ -29,10 +33,11 @@ public class MainActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleMap mMap;
-    private final LatLng defLoc = new LatLng(30.26, -84.18);
+    protected GoogleMap mMap;
+    protected final LatLng defLoc = new LatLng(30.2618, -84.1814);
     private LatLng currLoc;
     private GoogleApiClient mGoogleApiClient;
+    private TwitterGetter tg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +56,25 @@ public class MainActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        tg = new TwitterGetter(this);
     }
 
     @Override
     protected void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        tg.start();
+    }
+
+    @Override
+    protected void onPause(){
+        tg.interrupt();
+        super.onPause();
     }
 
     @Override
@@ -80,13 +97,70 @@ public class MainActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
 
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "You do not have the permissions set to display current location.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLocation != null) {
+            currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(currLoc).title("You!"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        }
+        else {
+            mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defLoc, 5));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {}
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
+
+    public void addMapMarker(final LatLng loc, final String title, final String tweet) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Create the marker
+                final Marker marker = mMap.addMarker(new MarkerOptions()
+                                .position(loc)
+                                .title(title)
+                                .snippet(tweet)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bird))
+                );
+
+                // Make it fade out
+                ValueAnimator animator = ValueAnimator.ofFloat(1, 0);
+                animator.setDuration(60000);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        float alpha = (float) animation.getAnimatedValue();
+                        marker.setAlpha(alpha);
+
+                        int roundedAlpha = Math.round(alpha);
+                        if (roundedAlpha == 0) {
+                            marker.remove();
+                        }
+                    }
+                });
+                animator.start();
+            }
+        });
     }
 
     /*
@@ -108,27 +182,6 @@ public class MainActivity
         LocationFetcher locationFetcher = new LocationFetcher();
         locationFetcher.execute();
     }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "You do not have the permissions set to display current location.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLocation != null) {
-            currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(currLoc).title("You!"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(currLoc));
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {}
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     /*
      * LocationFetcher
@@ -166,7 +219,6 @@ public class MainActivity
         protected Location doInBackground(Void... params) {
             // Wait for the location to be updated
             while (!hasLocationBeenFetched) {}
-
             return newLocation;
         }
 

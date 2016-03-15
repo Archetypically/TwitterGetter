@@ -1,17 +1,19 @@
 package edu.fsu.mobile.project1;
 
 import android.content.res.Resources;
-import android.os.Handler;
 
-/*import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.scribe.builder.*;
-import org.scribe.builder.api.*;
-import org.scribe.model.*;
-import org.scribe.oauth.*;*/
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.TwitterApi;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Token;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,40 +21,45 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class TwitterGetter extends Thread {
-/*
+
     private static final String STREAM_URI =
             "https://api.twitter.com/1.1/search/tweets.json?";
-    // Need primary map activity
-    private Resources res;
-    private Handler handler = new Handler();
-    private static final String geoCode = null //"geocode=33.12743%2C-117.2654932%2C30mi";
+    private MainActivity mainActivity;
+    private static Resources res;
+    private static String geoCode;
     private static final String sinceID = "&since_id=";
     private static int lastIDNum = -1;
     private static String twitURL = null;
     private static final int timeout = 120;
     private static final long refreshTimeout = 15000;
 
-    public TwitterGetter(TwitterMapActivity twitterMap) {
-        //this.twitterMap = twitterMap;
-        //res = twitterMap.getResources();
+    public TwitterGetter(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+        res = mainActivity.getResources();
+
+        geoCode = "geocode=" +
+                mainActivity.defLoc.latitude +
+                "%2C" +
+                mainActivity.defLoc.longitude +
+                "%2C30mi";
     }
 
     public void run() {
-        ArrayList<Integer> ids = new ArrayList<Integer>();
+        ArrayList<Integer> ids = new ArrayList<>();
         String line;
         JSONObject jObj = null;
-        JSONObject jObj2 = null;
-        JSONObject jObj3 = null;
-        JSONObject geoObj = null;
+        JSONObject jObj2;
+        JSONObject jObj3;
+        JSONObject geoObj;
         JSONArray jArr = null;
-        String sn = null;
-        String msg = null;
-        //LatLng coords = null;
-        double lng = 0;
-        double lat = 0;
-        int id = 0;
+        String sn;
+        String msg;
+        LatLng coords;
+        double lng;
+        double lat;
+        int id;
 
-        while (true) {
+        while (!Thread.interrupted()) {
             OAuthService service = new ServiceBuilder()
                     .provider(TwitterApi.class)
                     .apiKey(res.getString(R.string.api_key))
@@ -79,10 +86,14 @@ public class TwitterGetter extends Thread {
                     try {
                         jObj = new JSONObject(line);
                         jArr = jObj.getJSONArray("statuses");
-                    } catch (JSONException e) { }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 reader.close();
-            }catch(IOException ioe){ }
+            }catch(IOException ioe){
+                ioe.printStackTrace();
+            }
 
             if (jArr != null) {
                 for (int i = 0; i < jArr.length(); i++) {
@@ -100,23 +111,27 @@ public class TwitterGetter extends Thread {
 
                         coords = new LatLng(lat, lng);
 
-                        System.out.println(ids.contains(id));
                         if(!ids.contains(id)) {
                             ids.add(id);
-                            twitterMap.addTweetToMap(sn, msg, coords, timeout);
+                            mainActivity.addMapMarker(coords, sn, msg);
                         }
 
-                    } catch (JSONException e) { }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 try {
                     jObj2 = jObj.getJSONObject("search_metadata");
                     lastIDNum = jObj2.getInt("max_id");
-                } catch (JSONException e) { }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             try {
                 Thread.sleep(refreshTimeout);
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
-    */
 }
