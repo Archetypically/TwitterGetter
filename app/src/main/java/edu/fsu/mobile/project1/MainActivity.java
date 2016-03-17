@@ -2,6 +2,7 @@ package edu.fsu.mobile.project1;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,6 +14,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Gallery;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -38,6 +45,7 @@ public class MainActivity
     protected LatLng currLoc;
     private GoogleApiClient mGoogleApiClient;
     private TwitterGetter tg;
+    private Marker locMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +74,17 @@ public class MainActivity
 
     @Override
     protected void onResume(){
-        tg = new TwitterGetter(this);
         super.onResume();
+        tg = new TwitterGetter(this);
         tg.start();
     }
 
     @Override
     protected void onPause(){
-        tg.interrupt();
+        tg.stop();
+        if (locMarker != null){
+            locMarker.remove();
+        }
         super.onPause();
     }
 
@@ -101,7 +112,6 @@ public class MainActivity
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
-
     }
 
     @Override
@@ -114,12 +124,12 @@ public class MainActivity
                 mGoogleApiClient);
         if (mLocation != null) {
             currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(currLoc).title("You!"));
+            locMarker = mMap.addMarker(new MarkerOptions().position(currLoc).title("You!"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         }
         else {
-            mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
+            locMarker = mMap.addMarker(new MarkerOptions().position(defLoc).title("FSU"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defLoc, 5));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         }
