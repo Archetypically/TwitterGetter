@@ -31,7 +31,7 @@ public class TwitterGetter extends Thread {
     private static int lastIDNum = -1;
     private static String twitURL = null;
     private static final int timeout = 120;
-    private static final long refreshTimeout = 15000;
+    private static final long refreshTimeout = 60000;
 
     public TwitterGetter(MainActivity mainActivity) {
         this.mainActivity = mainActivity;

@@ -158,7 +158,7 @@ public class MainActivity
                         }
                     }
                 });
-                animator.start();
+                // animator.start();
             }
         });
     }
