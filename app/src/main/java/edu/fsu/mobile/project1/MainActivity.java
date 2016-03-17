@@ -81,7 +81,7 @@ public class MainActivity
 
     @Override
     protected void onPause(){
-        tg.stop();
+        tg.interrupt();
         if (locMarker != null){
             locMarker.remove();
         }
