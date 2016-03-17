@@ -56,7 +56,6 @@ public class MainActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        tg = new TwitterGetter(this);
     }
 
     @Override
@@ -67,6 +66,7 @@ public class MainActivity
 
     @Override
     protected void onResume(){
+        tg = new TwitterGetter(this);
         super.onResume();
         tg.start();
     }
