@@ -31,7 +31,7 @@ public class TwitterGetter extends Thread {
     private static int lastIDNum = -1;
     private static String twitURL = null;
     private static final int timeout = 120;
-    private static final long refreshTimeout = 60000;
+    private static final long refreshTimeout = 15000;
 
     public TwitterGetter(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
@@ -65,6 +65,9 @@ public class TwitterGetter extends Thread {
         JSONArray jArr = null;
         String sn;
         String msg;
+        String name;
+        String loc;
+        String time;
         LatLng coords;
         double lng;
         double lat;
@@ -112,8 +115,11 @@ public class TwitterGetter extends Thread {
                         jObj2 = jArr.getJSONObject(i);
                         jObj3 = jObj2.getJSONObject("user");
 
+                        time = jObj2.getString("created_at");
                         msg = jObj2.getString("text");
                         sn = jObj3.getString("screen_name");
+                        name = jObj3.getString("name");
+                        loc = jObj3.getString("location");
                         id = jObj2.getInt("id");
 
                         geoObj = jObj2.getJSONObject("geo");
@@ -124,7 +130,7 @@ public class TwitterGetter extends Thread {
 
                         if(!ids.contains(id)) {
                             ids.add(id);
-                            mainActivity.addMapMarker(coords, sn, msg);
+                            mainActivity.addMapMarker(coords, sn, msg, name, loc, time);
                         }
 
                     } catch (JSONException e) {

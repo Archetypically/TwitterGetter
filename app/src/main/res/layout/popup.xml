@@ -1,34 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/profilePic"
+        android:src="@drawable/bird"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/user"
+        android:layout_alignStart="@+id/user" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/profilePic" />
+        android:text="name"
+        android:id="@+id/name"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="100dp"
+        android:paddingTop="30dp"
+        android:textColor="#030303"
+        android:textSize="20sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/user"
-        android:text="user" />
+        android:text="user"
+        android:paddingLeft="100dp"
+        android:paddingTop="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="18sp"
+        android:textColor="#030303" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tweet"
-        android:text="tweet" />
+        android:text="tweet"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/profilePic"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/time"
-        android:text="time" />
+        android:text="time"
+        android:layout_below="@+id/location"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="30dp"
+        android:textStyle="italic" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/location"
-        android:text="location" />
-</LinearLayout>
+        android:text="location"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tweet"
+        android:paddingLeft="30dp"
+        android:textStyle="italic"
+        android:paddingTop="10dp" />
+</RelativeLayout>

@@ -3,6 +3,7 @@ package edu.fsu.mobile.project1;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,6 +35,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class MainActivity
         extends FragmentActivity
         implements OnMapReadyCallback,
@@ -46,6 +52,7 @@ public class MainActivity
     private GoogleApiClient mGoogleApiClient;
     private TwitterGetter tg;
     private Marker locMarker;
+    private Map<Marker, Bundle> markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +71,8 @@ public class MainActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        markers = new HashMap<Marker, Bundle>();
     }
 
     @Override
@@ -112,6 +121,25 @@ public class MainActivity
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Intent popIntent = new Intent (MainActivity.this, Pop.class);
+                Bundle tweetData = new Bundle();
+                Bundle fromMap = markers.get(marker);
+
+                tweetData.putString("username", fromMap.getString("username"));
+                tweetData.putString("name", fromMap.getString("name"));
+                tweetData.putString("tweet", fromMap.getString("tweet"));
+                tweetData.putString("location", fromMap.getString("location"));
+                tweetData.putString("time", fromMap.getString("time"));
+
+                popIntent.putExtras(tweetData);
+
+                startActivity(popIntent);
+            }
+        });
     }
 
     @Override
@@ -141,7 +169,9 @@ public class MainActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 
-    public void addMapMarker(final LatLng loc, final String title, final String tweet) {
+    public void addMapMarker(final LatLng loc, final String title,
+                             final String tweet, final String name,
+                             final String location, final String time) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -152,6 +182,15 @@ public class MainActivity
                                 .snippet(tweet)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.bird))
                 );
+
+                Bundle markerData = new Bundle();
+                markerData.putString("username", title);
+                markerData.putString("name", name);
+                markerData.putString("tweet", tweet);
+                markerData.putString("location", location);
+                markerData.putString("time", time);
+
+                markers.put(marker, markerData);
 
                 // Make it fade out
                 ValueAnimator animator = ValueAnimator.ofFloat(1, 0);
